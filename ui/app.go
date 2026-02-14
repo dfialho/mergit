@@ -19,16 +19,14 @@ import (
 const maxPDFs = 100
 
 type PDFMergerApp struct {
-	app          fyne.App
-	window       fyne.Window
-	pdfFiles     []string
-	fileList     *widget.List
-	mergeButton  *widget.Button
-	addButton    *widget.Button
-	clearButton  *widget.Button
-	statusLabel  *widget.Label
-	dragStartIdx int
-	isDragging   bool
+	app         fyne.App
+	window      fyne.Window
+	pdfFiles    []string
+	fileList    *widget.List
+	mergeButton *widget.Button
+	addButton   *widget.Button
+	clearButton *widget.Button
+	statusLabel *widget.Label
 }
 
 // NewPDFMergerApp creates and initializes the application
@@ -37,11 +35,9 @@ func NewPDFMergerApp() *PDFMergerApp {
 	w := a.NewWindow("mergit - PDF Merger")
 
 	pdfApp := &PDFMergerApp{
-		app:          a,
-		window:       w,
-		pdfFiles:     []string{},
-		dragStartIdx: -1,
-		isDragging:   false,
+		app:      a,
+		window:   w,
+		pdfFiles: []string{},
 	}
 
 	pdfApp.setupUI()
@@ -54,7 +50,7 @@ func (p *PDFMergerApp) setupUI() {
 	p.statusLabel = widget.NewLabel("Drop PDF files here or click 'Add PDF'")
 	p.statusLabel.Alignment = fyne.TextAlignCenter
 
-	// Create file list widget with drag-and-drop reordering
+	// Create file list widget with up/down buttons for reordering
 	p.fileList = widget.NewList(
 		func() int {
 			return len(p.pdfFiles)
@@ -62,40 +58,59 @@ func (p *PDFMergerApp) setupUI() {
 		func() fyne.CanvasObject {
 			icon := widget.NewIcon(theme.DocumentIcon())
 			label := widget.NewLabel("Template")
+
+			upBtn := widget.NewButtonWithIcon("", theme.MoveUpIcon(), nil)
+			upBtn.Importance = widget.LowImportance
+
+			downBtn := widget.NewButtonWithIcon("", theme.MoveDownIcon(), nil)
+			downBtn.Importance = widget.LowImportance
+
 			removeBtn := widget.NewButtonWithIcon("", theme.DeleteIcon(), nil)
 			removeBtn.Importance = widget.LowImportance
 
-			return container.NewBorder(nil, nil, icon, removeBtn, label)
+			buttons := container.NewHBox(upBtn, downBtn, removeBtn)
+			return container.NewBorder(nil, nil, icon, buttons, label)
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
 			border := item.(*fyne.Container)
 			label := border.Objects[0].(*widget.Label)
-			removeBtn := border.Objects[2].(*widget.Button)
+			buttonsBox := border.Objects[2].(*fyne.Container)
+
+			upBtn := buttonsBox.Objects[0].(*widget.Button)
+			downBtn := buttonsBox.Objects[1].(*widget.Button)
+			removeBtn := buttonsBox.Objects[2].(*widget.Button)
 
 			filename := filepath.Base(p.pdfFiles[id])
 			label.SetText(filename)
 
-			// Set up remove button for this specific item
+			// Set up up button
+			upBtn.OnTapped = func() {
+				p.moveUp(id)
+			}
+			// Disable up button for first item
+			if id == 0 {
+				upBtn.Disable()
+			} else {
+				upBtn.Enable()
+			}
+
+			// Set up down button
+			downBtn.OnTapped = func() {
+				p.moveDown(id)
+			}
+			// Disable down button for last item
+			if id == len(p.pdfFiles)-1 {
+				downBtn.Disable()
+			} else {
+				downBtn.Enable()
+			}
+
+			// Set up remove button
 			removeBtn.OnTapped = func() {
 				p.removeFile(id)
 			}
 		},
 	)
-
-	// Add drag and drop support for reordering
-	p.fileList.OnSelected = func(id widget.ListItemID) {
-		p.dragStartIdx = id
-		p.isDragging = true
-	}
-
-	p.fileList.OnUnselected = func(id widget.ListItemID) {
-		if p.isDragging && p.dragStartIdx != -1 && p.dragStartIdx != id {
-			// Reorder the files
-			p.reorderFiles(p.dragStartIdx, id)
-		}
-		p.isDragging = false
-		p.dragStartIdx = -1
-	}
 
 	// Buttons
 	p.addButton = widget.NewButtonWithIcon("Add PDF", theme.FileIcon(), func() {
@@ -201,22 +216,23 @@ func (p *PDFMergerApp) clearAllFiles() {
 	p.updateUI()
 }
 
-// reorderFiles moves a file from one position to another
-func (p *PDFMergerApp) reorderFiles(from, to int) {
-	if from == to || from < 0 || to < 0 || from >= len(p.pdfFiles) || to >= len(p.pdfFiles) {
+// moveUp moves a file up one position in the list
+func (p *PDFMergerApp) moveUp(index int) {
+	if index <= 0 || index >= len(p.pdfFiles) {
 		return
 	}
+	// Swap with previous item
+	p.pdfFiles[index], p.pdfFiles[index-1] = p.pdfFiles[index-1], p.pdfFiles[index]
+	p.updateUI()
+}
 
-	// Remove from old position
-	file := p.pdfFiles[from]
-	p.pdfFiles = append(p.pdfFiles[:from], p.pdfFiles[from+1:]...)
-
-	// Insert at new position
-	if to > from {
-		to-- // Adjust index because we removed an element
+// moveDown moves a file down one position in the list
+func (p *PDFMergerApp) moveDown(index int) {
+	if index < 0 || index >= len(p.pdfFiles)-1 {
+		return
 	}
-	p.pdfFiles = append(p.pdfFiles[:to], append([]string{file}, p.pdfFiles[to:]...)...)
-
+	// Swap with next item
+	p.pdfFiles[index], p.pdfFiles[index+1] = p.pdfFiles[index+1], p.pdfFiles[index]
 	p.updateUI()
 }
 
