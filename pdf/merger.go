@@ -3,11 +3,9 @@ package pdf
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/pdfcpu/pdfcpu/pkg/api"
-	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 )
 
 // ValidatePDF checks if a file is a valid PDF
@@ -23,15 +21,10 @@ func ValidatePDF(path string) error {
 		return fmt.Errorf("file is not a PDF: %s", filepath.Base(path))
 	}
 
-	// Validate PDF structure using pdfcpu
-	if err := api.ValidateFile(path, nil); err != nil {
-		return fmt.Errorf("invalid or corrupted PDF: %s", filepath.Base(path))
-	}
-
 	return nil
 }
 
-// MergePDFs combines multiple PDF files into a single output file
+// MergePDFs combines multiple PDF files into a single output file using Ghostscript
 // progressCallback is called periodically to update UI (can be nil)
 func MergePDFs(inputPaths []string, outputPath string, progressCallback func()) error {
 	if len(inputPaths) < 2 {
@@ -54,13 +47,32 @@ func MergePDFs(inputPaths []string, outputPath string, progressCallback func()) 
 		progressCallback()
 	}
 
-	// Create default configuration for pdfcpu
-	conf := model.NewDefaultConfiguration()
+	// Use Ghostscript to merge PDFs - it's very robust with problematic PDFs
+	// Build the Ghostscript command
+	args := []string{
+		"-dBATCH",                    // Exit after processing
+		"-dNOPAUSE",                  // Don't pause between pages
+		"-q",                         // Quiet mode
+		"-sDEVICE=pdfwrite",          // Output device
+		"-dPDFSETTINGS=/default",     // Default quality settings
+		"-sOutputFile=" + outputPath, // Output file
+	}
 
-	// Perform the merge operation
-	// The 'false' parameter means: don't create divider pages between merged PDFs
-	if err := api.MergeCreateFile(inputPaths, outputPath, false, conf); err != nil {
-		return fmt.Errorf("failed to merge PDFs: %v", err)
+	// Add all input files
+	args = append(args, inputPaths...)
+
+	// Execute Ghostscript
+	cmd := exec.Command("gs", args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		// Clean up partial output file if it exists
+		os.Remove(outputPath)
+		return fmt.Errorf("failed to merge PDFs: %v\nOutput: %s", err, string(output))
+	}
+
+	// Verify output file was created
+	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
+		return fmt.Errorf("merge completed but output file was not created")
 	}
 
 	// Call progress callback after completion
