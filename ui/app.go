@@ -56,29 +56,43 @@ func (p *PDFMergerApp) setupUI() {
 			return len(p.pdfFiles)
 		},
 		func() fyne.CanvasObject {
-			icon := widget.NewIcon(theme.DocumentIcon())
-			label := widget.NewLabel("Template")
-
+			// Create compact buttons with icons only
 			upBtn := widget.NewButtonWithIcon("", theme.MoveUpIcon(), nil)
 			upBtn.Importance = widget.LowImportance
 
 			downBtn := widget.NewButtonWithIcon("", theme.MoveDownIcon(), nil)
 			downBtn.Importance = widget.LowImportance
 
+			// PDF icon and label
+			icon := widget.NewIcon(theme.DocumentIcon())
+			label := widget.NewLabel("Template")
+
+			// Right side: delete button
 			removeBtn := widget.NewButtonWithIcon("", theme.DeleteIcon(), nil)
 			removeBtn.Importance = widget.LowImportance
 
-			buttons := container.NewHBox(upBtn, downBtn, removeBtn)
-			return container.NewBorder(nil, nil, icon, buttons, label)
+			// Layout: up, down, icon, label in horizontal row, delete on right
+			row := container.NewHBox(upBtn, downBtn, icon, label)
+
+			return container.NewBorder(nil, nil, nil, removeBtn, row)
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
 			border := item.(*fyne.Container)
-			label := border.Objects[0].(*widget.Label)
-			buttonsBox := border.Objects[2].(*fyne.Container)
 
-			upBtn := buttonsBox.Objects[0].(*widget.Button)
-			downBtn := buttonsBox.Objects[1].(*widget.Button)
-			removeBtn := buttonsBox.Objects[2].(*widget.Button)
+			// Find the row container (center of border)
+			var row *fyne.Container
+			var removeBtn *widget.Button
+			for _, obj := range border.Objects {
+				if hbox, ok := obj.(*fyne.Container); ok && len(hbox.Objects) == 4 {
+					row = hbox
+				} else if btn, ok := obj.(*widget.Button); ok {
+					removeBtn = btn
+				}
+			}
+
+			upBtn := row.Objects[0].(*widget.Button)
+			downBtn := row.Objects[1].(*widget.Button)
+			label := row.Objects[3].(*widget.Label)
 
 			filename := filepath.Base(p.pdfFiles[id])
 			label.SetText(filename)
