@@ -58,7 +58,8 @@ func MergePDFs(inputPaths []string, outputPath string, progressCallback func()) 
 	conf := model.NewDefaultConfiguration()
 
 	// Perform the merge operation
-	if err := api.MergeCreateFile(inputPaths, outputPath, conf); err != nil {
+	// The 'false' parameter means: don't create divider pages between merged PDFs
+	if err := api.MergeCreateFile(inputPaths, outputPath, false, conf); err != nil {
 		return fmt.Errorf("failed to merge PDFs: %v", err)
 	}
 

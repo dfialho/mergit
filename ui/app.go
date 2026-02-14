@@ -3,7 +3,6 @@ package ui
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -20,16 +19,16 @@ import (
 const maxPDFs = 100
 
 type PDFMergerApp struct {
-	app           fyne.App
-	window        fyne.Window
-	pdfFiles      []string
-	fileList      *widget.List
-	mergeButton   *widget.Button
-	addButton     *widget.Button
-	clearButton   *widget.Button
-	statusLabel   *widget.Label
-	dragStartIdx  int
-	isDragging    bool
+	app          fyne.App
+	window       fyne.Window
+	pdfFiles     []string
+	fileList     *widget.List
+	mergeButton  *widget.Button
+	addButton    *widget.Button
+	clearButton  *widget.Button
+	statusLabel  *widget.Label
+	dragStartIdx int
+	isDragging   bool
 }
 
 // NewPDFMergerApp creates and initializes the application
@@ -122,11 +121,11 @@ func (p *PDFMergerApp) setupUI() {
 
 	// Main layout
 	content := container.NewBorder(
-		p.statusLabel,   // top
-		buttonBox,       // bottom
-		nil,             // left
-		nil,             // right
-		p.fileList,      // center
+		p.statusLabel, // top
+		buttonBox,     // bottom
+		nil,           // left
+		nil,           // right
+		p.fileList,    // center
 	)
 
 	// Set up drag and drop for the window
