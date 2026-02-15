@@ -5,6 +5,7 @@
 
 import htmlContent from '../public/index.html';
 import pdfLibJs from '../public/pdf-lib.min.js';
+import faviconPng from '../public/favicon.png';
 
 export default {
   async fetch(request, env, ctx) {
@@ -15,6 +16,17 @@ export default {
       return new Response(pdfLibJs, {
         headers: {
           'Content-Type': 'application/javascript',
+          'Cache-Control': 'public, max-age=31536000, immutable',
+          'X-Content-Type-Options': 'nosniff',
+        },
+      });
+    }
+    
+    // Serve favicon.png
+    if (url.pathname === '/favicon.png') {
+      return new Response(faviconPng, {
+        headers: {
+          'Content-Type': 'image/png',
           'Cache-Control': 'public, max-age=31536000, immutable',
           'X-Content-Type-Options': 'nosniff',
         },

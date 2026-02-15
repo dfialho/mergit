@@ -7,3 +7,9 @@ compatibility_date = "2024-02-01"
 type = "Text"
 globs = ["**/*.html", "public/**/*.js"]
 fallthrough = true
+
+# Binary file imports (for PNG images)
+[[rules]]
+type = "Data"
+globs = ["**/*.png"]
+fallthrough = true
