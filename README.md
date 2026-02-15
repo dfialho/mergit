@@ -1,195 +1,206 @@
-# mergit - PDF Merger
+# Mergit 🔀
 
-A simple, standalone PDF merger application for Linux and Windows. Drag, drop, reorder, and merge multiple PDF files into a single document.
+A client-side PDF merger that runs entirely in your browser. No uploads, no servers, 100% private.
 
-## Features
+## ✨ Features
 
-✅ **Single binary** - No installation required, just run the executable  
-✅ **Cross-platform** - Works on Linux and Windows  
-✅ **Drag-and-drop interface** - Add PDF files by dragging them into the app  
-✅ **Reorder PDFs** - Click and drag to reorder files in the list  
-✅ **Simple workflow** - Add files, order them, click merge, choose destination  
-✅ **Progress indication** - Visual feedback during merge operation  
-✅ **Auto-reset** - Automatically clears after successful merge  
-✅ **File validation** - Ensures only valid PDFs are added  
-✅ **Maximum 100 PDFs** - Supports merging up to 100 documents  
+- 🚀 **No Installation** - Just open in your browser
+- 🔒 **100% Private** - All processing happens locally, files never leave your device
+- 📱 **Mobile Friendly** - Works on phones and tablets
+- 🎨 **Modern Design** - Beautiful, gradient-based UI
+- ⚡ **Fast** - Client-side processing using pdf-lib
+- 🌐 **Cross-Platform** - Works on any modern browser (Chrome, Firefox, Safari, Edge)
+- 💾 **Offline Capable** - Can work offline after first load
 
-## Download
+### Core Functionality
 
-Pre-built binaries will be available in the `build/` directory after compilation:
-- **Linux:** `build/mergit`
-- **Windows:** `build/mergit.exe`
+✅ Add PDFs via drag-and-drop or file picker
+✅ Reorder PDFs with up/down arrow buttons
+✅ Remove individual PDFs
+✅ Clear all PDFs
+✅ Merge 2-100 PDFs into a single file 
+✅ Custom filename on download
+✅ Default filename with today's date 
+✅ Auto-clear after merge
+✅ Error handling with user-friendly messages 
 
-## Usage
+## 🚀 Quick Start
 
-### Running the Application
+### Option 1: Open Locally
 
-**On Linux:**
-```bash
-./build/mergit
-```
+1. Download `index.html`
+2. Double-click to open in your browser
+3. Start merging PDFs!
 
-**On Windows:**
-Simply double-click `mergit.exe`
-
-### How to Merge PDFs
-
-1. **Launch mergit** - Open the application
-2. **Add PDF files** - Either:
-   - Drag and drop PDF files from your file manager into the window
-   - Click the "Add PDF" button to browse for files
-3. **Reorder files** (optional) - Click and drag files in the list to change their order
-4. **Remove files** (optional) - Click the [X] button next to any file to remove it
-5. **Merge** - Click the "Merge PDFs" button (enabled when you have 2+ PDFs)
-6. **Choose destination** - Select where to save your merged PDF
-   - Default filename: `merged_YYYY-MM-DD.pdf` (today's date)
-7. **Done!** - A success dialog will show the saved file path
-   - The list automatically clears, ready for the next merge
-
-## Building from Source
-
-### Prerequisites
-
-#### Required for Linux builds:
-```bash
-# On Ubuntu/Debian:
-sudo apt-get update
-sudo apt-get install -y golang gcc libgl1-mesa-dev xorg-dev
-
-# Verify Go version (1.21 or higher required):
-go version
-```
-
-#### Additional for Windows cross-compilation:
-```bash
-# On Ubuntu/Debian:
-sudo apt-get install -y gcc-mingw-w64
-```
-
-### Install Dependencies
+### Option 2: Run with Local Server
 
 ```bash
-# Navigate to the project directory
-cd mergit
+# Using Python 3
+python3 -m http.server 8000
 
-# Download Go dependencies
-go mod download
+# Using Python 2
+python -m SimpleHTTPServer 8000
+
+# Using Node.js
+npx serve
+
+# Using PHP
+php -S localhost:8000
 ```
 
-### Build Commands
+Then open: `http://localhost:8000`
 
-#### Build for Linux:
-```bash
-# Using the build script (recommended):
-chmod +x build/build-linux.sh
-./build/build-linux.sh
+## 🛠️ How It Works
 
-# Or manually:
-go build -ldflags="-s -w" -o build/mergit
-```
-
-#### Build for Windows (from Linux):
-```bash
-# Using the build script (recommended):
-chmod +x build/build-windows.sh
-./build/build-windows.sh
-
-# Or manually:
-GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc \
-  go build -ldflags="-s -w -H windowsgui" -o build/mergit.exe
-```
-
-#### Build for both platforms:
-```bash
-chmod +x build/build-all.sh
-./build/build-all.sh
-```
-
-### Binary Sizes
-
-- **Linux:** ~18-22 MB (single binary, no dependencies)
-- **Windows:** ~20-25 MB (single .exe, no dependencies)
-
-All dependencies are statically linked into the binary.
-
-## Project Structure
+### Architecture
 
 ```
-mergit/
-├── main.go              # Application entry point
-├── go.mod               # Go module dependencies
-├── go.sum               # Dependency checksums
-├── pdf/
-│   └── merger.go        # PDF merging business logic
-├── ui/
-│   └── app.go           # Fyne UI implementation
-├── build/
-│   ├── build-linux.sh   # Linux build script
-│   ├── build-windows.sh # Windows build script
-│   ├── build-all.sh     # Build both platforms
-│   ├── mergit           # Linux binary (after build)
-│   └── mergit.exe       # Windows binary (after build)
-└── README.md            # This file
+User drops PDF files
+      ↓
+Validate file type (.pdf)
+      ↓
+Add to in-memory array
+      ↓
+User reorders/removes files
+      ↓
+Click "Merge PDFs"
+      ↓
+Load each PDF with pdf-lib
+      ↓
+Copy all pages to new PDF
+      ↓
+Generate merged PDF bytes
+      ↓
+Prompt for filename
+      ↓
+Download to user's device
+      ↓
+Clear list (ready for next merge)
 ```
 
-## Technology Stack
+### Privacy & Security
 
-- **Language:** Go 1.21+
-- **GUI Framework:** [Fyne v2.4+](https://fyne.io/) - Cross-platform native GUI
-- **PDF Library:** [pdfcpu v0.6+](https://github.com/pdfcpu/pdfcpu) - PDF manipulation (Apache 2.0 license)
+🔒 **All processing is client-side:**
+- PDFs are loaded into browser memory only
+- No files are uploaded to any server
+- No tracking or analytics
+- No external dependencies except pdf-lib
 
-## Limitations
+🌐 **Can work offline:**
+- After first load, pdf-lib is cached by the browser
+- The HTML file can be saved and used offline
 
-- Maximum 100 PDF files per merge operation
-- Requires at least 2 PDF files to perform a merge
-- Does not support password-protected PDFs
-- No page-level manipulation (merges entire documents)
+## 🎨 Features Overview
 
-## Troubleshooting
+### File Management
+- **Add PDFs**: Drag-and-drop or click "Add PDF" button
+- **Reorder**: Use ↑ and ↓ arrow buttons
+- **Remove**: Click ✕ button next to any file
+- **Clear All**: Remove all files at once
 
-### Build Issues
+### Merging
+- **Minimum**: 2 PDFs required
+- **Maximum**: 100 PDFs allowed
+- **Process**: Client-side, no upload needed
+- **Speed**: Depends on PDF sizes and device performance
 
-**"command not found: go"**
-- Go is not installed. Follow the prerequisites section to install Go 1.21 or higher.
+### Download
+- **Prompt**: User is asked for filename
+- **Default**: `merged_YYYY-MM-DD.pdf` (today's date)
+- **Format**: Standard PDF format
+- **Location**: Browser's default download folder
 
-**"x86_64-w64-mingw32-gcc: command not found"**
-- Install mingw-w64: `sudo apt-get install gcc-mingw-w64`
 
-**"cannot find package"**
-- Run `go mod download` to download dependencies
+## 🐛 Troubleshooting
 
-### Runtime Issues
+### "Not a PDF file" Error
+- Make sure the file has `.pdf` extension
+- Verify the file isn't corrupted
+- Try opening it in a PDF viewer first
 
-**"Invalid or corrupted PDF"**
-- The file may be damaged or password-protected
-- Try opening the PDF in a PDF reader to verify it's valid
+### Merge Fails
+- **Large files**: Browser may run out of memory with very large PDFs (100+ MB)
+- **Corrupted PDFs**: Try re-downloading the PDF
+- **Password-protected PDFs**: Not currently supported
 
-**Application won't start on Linux**
-- Make sure the binary has execute permissions: `chmod +x build/mergit`
-- Verify required libraries are installed (see prerequisites)
+### Slow Performance
+- **Large PDFs**: Processing 100+ page PDFs may take time
+- **Many files**: Merging 50+ files will be slower
+- **Old devices**: Use a faster device or fewer files
 
-**Application won't start on Windows**
-- Windows Defender may block the executable initially
-- Right-click → Properties → Unblock if prompted
+### Download Doesn't Start
+- Check browser's download permissions
+- Try a different browser
+- Disable browser extensions that block downloads
 
-## License
 
-This project uses the following open-source libraries:
-- **Fyne** - BSD 3-Clause License
-- **pdfcpu** - Apache License 2.0
+## 📊 File Size Limits
 
-Feel free to use, modify, and distribute this application.
+- **Individual PDF**: No hard limit, but 100MB+ may be slow
+- **Total merge**: Limited by browser memory (~2GB typically)
+- **Number of files**: Maximum 100 PDFs per merge
 
-## Contributing
 
-This is a simple standalone tool. If you find bugs or want to add features:
-1. Fork the repository
-2. Make your changes
-3. Test on both Linux and Windows
-4. Submit a pull request
+## 🔧 Customization
 
-## Credits
+### Change Theme Colors
 
-- Built with [Go](https://golang.org/)
-- UI powered by [Fyne](https://fyne.io/)
-- PDF merging by [pdfcpu](https://github.com/pdfcpu/pdfcpu)
+Edit the CSS `:root` variables:
+
+```css
+:root {
+    --primary: #6366f1;        /* Main color */
+    --primary-dark: #4f46e5;   /* Darker shade */
+    --bg: #0f172a;             /* Background */
+    --text: #f1f5f9;           /* Text color */
+}
+```
+
+### Change Max PDF Limit
+
+Edit the JavaScript constant:
+
+```javascript
+const state = {
+    maxPDFs: 100  // Change to desired limit
+};
+```
+
+### Bundle pdf-lib Inline
+
+For offline use, download pdf-lib and embed it:
+
+```html
+<script>
+    // Paste entire pdf-lib.min.js content here
+</script>
+```
+
+This makes the HTML file larger (~520KB) but fully offline-capable.
+
+---
+
+## 📝 License
+
+MIT License - Free for personal and commercial use
+
+---
+
+## 🙏 Credits
+
+- **pdf-lib** - [github.com/Hopding/pdf-lib](https://github.com/Hopding/pdf-lib)
+- **Design** - Custom modern gradient theme
+
+---
+
+## 🚀 Future Enhancements (Ideas)
+
+Possible features for future versions:
+- [ ] PDF preview thumbnails
+- [ ] Page range selection
+- [ ] Dark/light mode toggle
+- [ ] PWA support (install as app)
+- [ ] Batch processing (save merge configs)
+- [ ] Password-protected PDF support
+- [ ] PDF compression options
+

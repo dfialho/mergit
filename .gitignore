@@ -1,23 +1,6 @@
-# Binaries
-build/mergit
-build/mergit.exe
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
-# Test binary
-*.test
-
-# Output of the go coverage tool
-*.out
-
-# Dependency directories
-vendor/
-
-# Go workspace file
-go.work
+# OS
+.DS_Store
+Thumbs.db
 
 # IDE
 .idea/
@@ -26,6 +9,9 @@ go.work
 *.swo
 *~
 
-# OS
-.DS_Store
-Thumbs.db
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
