@@ -2,8 +2,8 @@ name = "mergit"
 main = "src/index.js"
 compatibility_date = "2024-02-01"
 
-# Text file imports (for HTML bundling)
+# Text file imports (for HTML and static JS bundling)
 [[rules]]
 type = "Text"
-globs = ["**/*.html", "**/*.js"]
+globs = ["**/*.html", "public/**/*.js"]
 fallthrough = true
