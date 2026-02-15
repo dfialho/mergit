@@ -1,13 +1,27 @@
 /**
  * Cloudflare Worker for mergit PDF merger
- * Serves only the index.html file
+ * Serves static files (HTML and bundled JS)
  */
 
 import htmlContent from '../public/index.html';
+import pdfLibJs from '../public/pdf-lib.min.js';
 
 export default {
   async fetch(request, env, ctx) {
-    // Serve the HTML for all requests (only index.html is deployed)
+    const url = new URL(request.url);
+    
+    // Serve pdf-lib.min.js
+    if (url.pathname === '/pdf-lib.min.js') {
+      return new Response(pdfLibJs, {
+        headers: {
+          'Content-Type': 'application/javascript',
+          'Cache-Control': 'public, max-age=31536000, immutable',
+          'X-Content-Type-Options': 'nosniff',
+        },
+      });
+    }
+    
+    // Serve the HTML for all other requests
     return new Response(htmlContent, {
       headers: {
         'Content-Type': 'text/html;charset=UTF-8',
@@ -17,8 +31,8 @@ export default {
         'X-Frame-Options': 'DENY',
         'X-XSS-Protection': '1; mode=block',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
-        // CSP to allow pdf-lib from unpkg CDN
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:;",
+        // CSP - pdf-lib is now bundled locally
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:;",
       },
     });
   },

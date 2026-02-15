@@ -5,5 +5,5 @@ compatibility_date = "2024-02-01"
 # Text file imports (for HTML bundling)
 [[rules]]
 type = "Text"
-globs = ["**/*.html"]
+globs = ["**/*.html", "**/*.js"]
 fallthrough = true
