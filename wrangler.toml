@@ -2,13 +2,18 @@ name = "mergit"
 main = "src/index.js"
 compatibility_date = "2024-02-01"
 
-# Text file imports (for HTML and static JS bundling)
+# Text file imports (for HTML and JS)
 [[rules]]
 type = "Text"
-globs = ["**/*.html", "public/**/*.js"]
+globs = ["**/*.html"]
 fallthrough = true
 
-# Binary file imports (for PNG images)
+[[rules]]
+type = "Text"
+globs = ["**/pdf-lib.min.js"]
+fallthrough = true
+
+# Binary file imports (for images)
 [[rules]]
 type = "Data"
 globs = ["**/*.png"]
