@@ -1,0 +1,29 @@
+{
+  "name": "mergit",
+  "version": "1.0.0",
+  "description": "Client-side PDF merger - Cloudflare Workers deployment",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "wrangler deploy --dry-run"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dfialho/mergit.git"
+  },
+  "keywords": [
+    "pdf",
+    "merge",
+    "cloudflare",
+    "workers",
+    "client-side"
+  ],
+  "author": "dfialho",
+  "license": "MIT"
+}
